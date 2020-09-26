@@ -1,34 +1,10 @@
 # -*- coding: utf-8 -*-
-
-
-"""
-=================================
-General Search String Token Lexer
-=================================
-
-:Authors:
-    Moritz Emanuel Beber
-:Date:
-    2015-09-16
-:Copyright:
-    Copyright |c| 2015, Max Plank Institute for Molecular Genetics,
-    all rights reserved.
-:File:
-    general.py
-
-.. |c| unicode: U+A9
-"""
-
-
-from __future__ import absolute_import, print_function
-
 import ply.lex as lex
 
+__all__ = ["SearchStringLexer"]
 
-__all__ = ["GeneralSearchStringLexer"]
 
-
-class GeneralSearchStringLexer(object):
+class SearchStringLexer(object):
     """
     """
 
@@ -37,30 +13,35 @@ class GeneralSearchStringLexer(object):
     )
     # List of token names.   This is always required
     tokens = (
-       "WORD",
-       "WILDCARD",
-       "NOT",
-       "AND",
-       "OR",
-       "LPAREN",
-       "RPAREN",
-       "SYMBOL",
-       "LITERAL_QUOTE",
-       "SPACE",
-       "QUOTE"
+        "WORD",
+        "WILDCARD",
+        "NOT",
+        "AND",
+        "OR",
+        "LPAREN",
+        "RPAREN",
+        "SYMBOL",
+        "LITERAL_QUOTE",
+        "SPACE",
+        "QUOTE",
+        "FIELD",
+        "PROXIMITY",
+        # "DATE"
     )
 
     # A string containing ignored characters (spaces and tabs)
-    t_ignore = " \t\r\n\f\v"  # whitespace (interpreted literally not as regex)
+    t_ignore = "\t\r\n\f\v"  # whitespace (interpreted literally not as regex)
     # Regular expression rules for simple tokens
-    t_WORD = r"\w+"
+    t_WORD = r"[\w-]+"
     t_WILDCARD = r"\*"
-    t_NOT = r"-|~|!|not\b|NOT\b"
+    t_NOT = r"!|not\b|NOT\b"
     t_AND = r"&{1,2}|and\b|AND\b"
     t_OR = r"\|{1,2}|or\b|OR\b"
+    t_FIELD = r":"
+    t_PROXIMITY = r"(~\d+)"
     # rules for 'quoting' state
     t_quoting_ignore = ""
-    t_quoting_SYMBOL = r"([^'\"\s\\]|\\(?!'|\"))+"  # anything but other tokens
+    t_quoting_SYMBOL = r"([^\"\s\\]|\\(?!|\"))+"  # anything but other tokens
 
     def __init__(self, illegal="ignore", **kw_args):
         """A composite class of a ply.lex.lex.
@@ -75,8 +56,7 @@ class GeneralSearchStringLexer(object):
         kw_args :
             Keyword arguments are passed to the ply.lex.lex call.
         """
-        super(GeneralSearchStringLexer, self).__init__()
-# TODO: pick between different error handling methods
+        super(SearchStringLexer, self).__init__()
         self.lexer = lex.lex(module=self, **kw_args)
         self.parens_level = 0
         self.last_lparens = 0
